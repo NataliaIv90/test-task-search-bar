@@ -77,10 +77,10 @@ export const Search = () => {
         />
         <ul className='coins-list'>
           {isFavorites ? (
-            renderListData(favorites, toggleFavoriteCoin, favorites)
+            renderListData(favorites, toggleFavoriteCoin, favorites, searchQuery)
           ) : (
             coinsData && Array.isArray(coinsData) ? (
-              renderListData(coinsData, toggleFavoriteCoin, favorites)
+              renderListData(coinsData, toggleFavoriteCoin, favorites, searchQuery)
             ) : null
           )}
         </ul>
