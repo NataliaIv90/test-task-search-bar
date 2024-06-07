@@ -61,7 +61,7 @@
   width: 300px;
   height: 450px;
   overflow: hidden;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   position: absolute;
   transform: translateY(38px);
   background-color: #212121ee;
@@ -71,22 +71,28 @@
   box-shadow: 3px 3px 10px #1fd30077
 }
 
-.list::-webkit-scrollbar {
+.virtual-scroll-container {
+  height: 350px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.virtual-scroll-container::-webkit-scrollbar {
   width: 10px;
 }
 
-.list::-webkit-scrollbar-track {
+.virtual-scroll-container::-webkit-scrollbar-track {
   background: inherit;
   border-radius: 15px;
 }
 
-.list::-webkit-scrollbar-thumb {
+.virtual-scroll-container::-webkit-scrollbar-thumb {
   background-color: #888;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
 
-.list::-webkit-scrollbar-thumb:hover {
+.virtual-scroll-container::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
@@ -95,6 +101,17 @@
   grid-template-columns: 1fr 8fr 1fr;
   align-items: center;
   gap: 6px;
+  padding-bottom: 1rem;
+  position: relative;
+}
+
+.list__input-container::after {
+  content: '';
+  width: 300px;
+  position: absolute;
+  left: -15px;
+  top: 30px;
+  border-bottom: 1px solid #ddd;
 }
 
 .search__close-btn {
@@ -115,7 +132,6 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 0.5rem auto;
 }
 
 .list__toggle-view-btn {
@@ -128,6 +144,11 @@
   gap: 3px;
   text-transform: uppercase;
   font-weight: 400;
+  border-radius: 15px;
+}
+
+.list__toggle-view-btn:active {
+  background-color: #171717;
 }
 
 .list__toggle-view-btn:hover {
@@ -146,7 +167,7 @@
 
 .coins-list {
   list-style: none;
-  padding: 0.5rem 1rem;
+  padding: 1.5rem 0.5rem;
   margin: 0;
 }
 

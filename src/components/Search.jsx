@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReactComponent as SearchIcon } from '../images/search.svg';
 import { ModeBtnsContainer } from './ModeBtns';
 import { SearchInput } from './SearchInput';
 import { useFetchData } from '../utils/useFetchData';
 import { renderListData } from '../utils/renderListData';
+import useVirtualScroll from '../utils/useVirtualScroll';
 
 export const Search = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -11,20 +12,31 @@ export const Search = () => {
   const [isFavorites, setFavorites] = useState(false);
   const [coinsData, setCoinsData] = useState([]);
   const [favorites, setFavoritesState] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   const { apiData } = useFetchData();
 
-  const useHandleClick = () => {
+  useEffect(() => {
     if (apiData) {
       setCoinsData(apiData);
     }
+  }, [apiData]);
 
+  useEffect(() => {
+    const dataToFilter = isFavorites ? favorites : coinsData;
+    if (searchQuery) {
+      setFilteredData(dataToFilter.filter((el) => el.toLowerCase().includes(searchQuery.toLowerCase())));
+    } else {
+      setFilteredData(dataToFilter);
+    }
+  }, [searchQuery, isFavorites, coinsData, favorites]);
+
+  const useHandleClick = () => {
     setOpenModal(!openModal);
   };
 
   const handleInput = (e) => {
     setQuery(e.target.value);
-    console.log(searchQuery);
   };
 
   const clearInput = () => {
@@ -51,6 +63,11 @@ export const Search = () => {
     });
   };
 
+  const { containerRef, startIndex, endIndex } = useVirtualScroll({
+    itemCount: filteredData.length,
+    itemHeight: 35,
+  });
+
   return (
     <div className='search'>
       <div>
@@ -75,15 +92,29 @@ export const Search = () => {
           isFavorites={isFavorites}
           handleModeBtnClick={handleModeBtnClick}
         />
-        <ul className='coins-list'>
-          {isFavorites ? (
-            renderListData(favorites, toggleFavoriteCoin, favorites, searchQuery)
-          ) : (
-            coinsData && Array.isArray(coinsData) ? (
-              renderListData(coinsData, toggleFavoriteCoin, favorites, searchQuery)
-            ) : null
-          )}
-        </ul>
+        <div
+          ref={containerRef}
+          className='virtual-scroll-container'
+          style={{
+            height: '400px',
+            overflowY: 'auto',
+            position: 'relative',
+          }}
+        >
+          <div style={{ height: `${filteredData.length * 35}px`, position: 'relative' }}>
+            <ul
+              className='coins-list'
+              style={{
+                position: 'absolute',
+                top: `${startIndex * 35}px`,
+                left: 0,
+                right: 0,
+              }}
+            >
+              {renderListData(filteredData, toggleFavoriteCoin, favorites, searchQuery, startIndex, endIndex)}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
