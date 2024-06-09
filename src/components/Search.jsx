@@ -1,10 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as SearchIcon } from '../images/search.svg';
-import { ModeBtnsContainer } from './ModeBtns';
-import { SearchInput } from './SearchInput';
 import { useFetchData } from '../utils/useFetchData';
-import { renderListData } from '../utils/renderListData';
 import useVirtualScroll from '../utils/useVirtualScroll';
+import { ReactComponent as FullStarIcon } from '../images/star-full.svg';
+import { ReactComponent as EmptyStarIcon } from '../images/star-empty.svg';
+import { ReactComponent as CloseIcon } from '../images/close.svg';
+import { ReactComponent as StarFullIcon } from '../images/star-full.svg';
+
+const SearchInput = ({ searchQuery, handleInput, clearInput }) => {
+  return (
+    <div className='list__input-container'>
+      <SearchIcon className='search-btn__icon' />
+      <input
+        type='text'
+        name='search'
+        className='search__inp'
+        id='search__inp'
+        placeholder='Search ...'
+        value={searchQuery}
+        onChange={handleInput}
+      />
+      {searchQuery.length ? (
+        <button
+          className='search__close-btn'
+          onClick={clearInput}
+        >
+          <CloseIcon className='close-icon' />
+        </button>
+      ) : null}
+    </div>
+  );
+};
+
+const renderListData = (data, toggleFavoriteCoin, favorites, startIndex, endIndex) => {
+  return data.slice(startIndex, endIndex).map((el, index) => (
+    <li key={startIndex + index} className='coins-list-item'>
+      <button onClick={() => toggleFavoriteCoin(el)}>
+        {favorites.includes(el) ? <FullStarIcon /> : <EmptyStarIcon />}
+      </button>
+      <p className='list-item-name'>{el}</p>
+    </li >
+  ));
+};
+
+const ModeBtnsContainer = ({ isFavorites, handleModeBtnClick }) => {
+  return (
+    <div className='search__mode-btn-container'>
+      <button
+        className={`list__toggle-view-btn ${isFavorites ? 'active' : ''}`}
+        onClick={() => handleModeBtnClick({ btn: 'fav-btn' })}
+      >
+        <StarFullIcon className='star-full-icon' />
+        Favorites
+      </button>
+      <button
+        className={`list__toggle-view-btn ${!isFavorites ? 'active' : ''}`}
+        onClick={() => handleModeBtnClick({ btn: 'all' })}
+      >
+        All coins
+      </button>
+    </div>
+  );
+};
 
 export const Search = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -85,7 +142,6 @@ export const Search = () => {
         <SearchInput
           handleInput={handleInput}
           clearInput={clearInput}
-          openModal={openModal}
           searchQuery={searchQuery}
         />
         <ModeBtnsContainer
@@ -95,23 +151,13 @@ export const Search = () => {
         <div
           ref={containerRef}
           className='virtual-scroll-container'
-          style={{
-            height: '400px',
-            overflowY: 'auto',
-            position: 'relative',
-          }}
         >
-          <div style={{ height: `${filteredData.length * 35}px`, position: 'relative' }}>
+          <div style={{ height: `${filteredData.length * 35}px` }}>
             <ul
               className='coins-list'
-              style={{
-                position: 'absolute',
-                top: `${startIndex * 35}px`,
-                left: 0,
-                right: 0,
-              }}
+              style={{ top: `${startIndex * 35}px` }}
             >
-              {renderListData(filteredData, toggleFavoriteCoin, favorites, searchQuery, startIndex, endIndex)}
+              {renderListData(filteredData, toggleFavoriteCoin, favorites, startIndex, endIndex)}
             </ul>
           </div>
         </div>
